@@ -5,8 +5,8 @@ name: Hi, Action
 # Controls when the workflow will run
 on:
   # Triggers the workflow
-  issues:
-    types: [opened, reopened, edited]
+  discussion:
+    types: [created, edited]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -131,4 +131,3 @@ jobs:
               issue_number: issueNumber,
               state: "closed"
             });
-
