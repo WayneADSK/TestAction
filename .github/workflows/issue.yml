@@ -37,16 +37,12 @@ jobs:
               issue_number: issueNumber,
               labels: [labelToAdd]
             });
-
-            console.log("Issue Number: ", context.issue.number)
-            console.log(`Issue Title: \n${ context.playload.issue.title }`)
-            console.log(`Issue Description: \n${ context.playload.issue.body }`)
             
-      # - name: Get issue info
-      #   run: |
-      #     echo "Issue Number: ${{ github.event.issue.number }}"
-      #     echo "Issue Title: ${{ github.event.issue.title }}"
-      #     echo "Issue Description: ${{ github.event.issue.body }}"
+      - name: Get issue info
+        run: |
+          echo "Issue Number: ${{ github.event.issue.number }}"
+          echo "Issue Title: ${{ github.event.issue.title }}"
+          echo "Issue Description: ${{ github.event.issue.body }}"
         
       - name: Setup workspace
         run: |
