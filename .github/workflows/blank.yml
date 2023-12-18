@@ -6,7 +6,7 @@ name: Hi, Translator
 on:
   # Triggers the workflow
   issues:
-    types: [opened, reopened]
+    types: [opened, reopened, edited]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -56,12 +56,12 @@ jobs:
       - name: Output artifact URL
         run:  echo "Artifact URL is $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/artifacts/${{ steps.artifact-upload-step.outputs.artifact-id }}"
 
-      # Post translated artifact URL by comment
+      # Post the artifact URL by comment
       - name: Post translated artifact URL by comment
         uses: peter-evans/create-or-update-comment@v3
         with:
           issue-number: ${{ github.event.issue.number }}
           body: |
-            The translation results download URL:
-            [artifact-issue-${{ github.event.issue.number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.artifact-upload-step.outputs.artifact-id }})
+            #### ✔ The translation results download URL:
+            🎉 [artifact-issue-${{ github.event.issue.number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.artifact-upload-step.outputs.artifact-id }})
           reactions: '+1'
