@@ -67,17 +67,11 @@ jobs:
       #   run:  echo "Artifact URL is $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/artifacts/${{ steps.artifact-upload-step.outputs.artifact-id }}"
 
       - name: Post the artifact URL by comment if succeed
-        uses: actions/github-script@v6
+        uses: wesleyscholl/create-discussion-comment@v1.0.18
         with:
-          script: |
-            const discussionNumber = ${{ github.event.discussion.number }}
-            const body =  #### 🎉 Task executed successfully. Here is the artifact download URL: \n\n[artifact-discussion-${{ github.event.discussion.number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.artifact-upload-step.outputs.artifact-id }})
-            github.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: discussionNumber,
-              body,
-            });
+          token: ${{ github.token }}
+          body: "#### 🎉 Task executed successfully. Here is the artifact download URL: \n\n[artifact-discussion-${{ github.event.discussion.number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.artifact-upload-step.outputs.artifact-id }})"
+          discussion-id: github.event.discussion.node_id
             
       # - name: Post the artifact URL by comment if succeed
       #   if: steps.artifact-upload-step.outcome == 'success'
