@@ -65,8 +65,12 @@ jobs:
 
       - name: Add sorry comment if failed
         if: steps.artifact-upload-step.outcome != 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
         run:
           gh issue comment ${{ github.event.issue.number }} --body "😢 Sorry for the failure"
           
       - name: Close Issue
+        env:
+            GH_TOKEN: ${{ github.token }}
         run: gh issue close ${{ github.event.issue.number }} --comment "Task completed, and close ticket." --reason "completed"
