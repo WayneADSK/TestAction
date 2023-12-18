@@ -27,6 +27,8 @@ jobs:
         uses: actions/github-script@v7.0.1
         with:
           script: |
+            console.log(context)
+          
             const issueNumber = context.issue.number;
             const labelToAdd = "task pending";
             await github.rest.issues.addLabels({
@@ -104,11 +106,11 @@ jobs:
           script: |
             const issueNumber = context.issue.number;
             
-            await github.rest.issues.addLabels({
+            await github.rest.issues.removeLabel({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: issueNumber,
-              labels: ['task pending']
+              name: 'task pending'
             });
             
             await github.rest.issues.addLabels({
