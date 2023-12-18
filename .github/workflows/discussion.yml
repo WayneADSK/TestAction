@@ -30,59 +30,60 @@ jobs:
             console.log(context)
             const discussion = context.payload.discussion;
             
+            console.log(`Discussion number: ${discussion.number}`);
             console.log(`Discussion title: ${discussion.title}`);
-            console.log(`Discussion body: ${discussion.title}`);
-            console.log(`URL: ${discussion.url}`);
+            console.log(`Discussion body: ${discussion.body}`);
+            console.log(`Discussion URL: ${discussion.html_url}`);
             
       - name: Get issue info
         run: |
-          echo "Issue Number: ${{ github.event.issue.number }}"
-          echo "Issue Title: ${{ github.event.issue.title }}"
-          echo "Issue Description: ${{ github.event.issue.body }}"
+          echo "Discussion Number: ${{ github.event.discussion.number }}"
+          echo "Discussion Title: ${{ github.event.discussion.title }}"
+          echo "Discussion Description: ${{ github.event.discussion.body }}"
         
-      - name: Setup workspace
-        run: |
-          echo "The current workspace is under: "
-          pwd
-          mkdir tmp
-          pip install wget
-          pip install nltk
+      # - name: Setup workspace
+      #   run: |
+      #     echo "The current workspace is under: "
+      #     pwd
+      #     mkdir tmp
+      #     pip install wget
+      #     pip install nltk
 
-      - name: Write issue body to file
-        run: |
-            cat << EOF > tmp/issue_body.txt
-            ${{ github.event.issue.body }}
-            EOF
-            cat tmp/issue_body.txt
+      # - name: Write issue body to file
+      #   run: |
+      #       cat << EOF > tmp/issue_body.txt
+      #       ${{ github.event.issue.body }}
+      #       EOF
+      #       cat tmp/issue_body.txt
             
-      - name: Upload the issue body file
-        uses: actions/upload-artifact@v4
-        id: artifact-upload-step
-        with:
-          name: artifact-issue-${{ github.event.issue.number }}
-          path: tmp/*.txt
+      # - name: Upload the artifact
+      #   uses: actions/upload-artifact@v4
+      #   id: artifact-upload-step
+      #   with:
+      #     name: artifact-discussion-${{ github.event.discussion.number }}
+      #     path: tmp/*.txt
 
-      - name: Output artifact URL
-        run:  echo "Artifact URL is $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/artifacts/${{ steps.artifact-upload-step.outputs.artifact-id }}"
+      # - name: Output artifact URL
+      #   run:  echo "Artifact URL is $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/artifacts/${{ steps.artifact-upload-step.outputs.artifact-id }}"
 
-      - name: Post the artifact URL by comment if succeed
-        if: steps.artifact-upload-step.outcome == 'success'
-        uses: peter-evans/create-or-update-comment@v3
-        with:
-          issue-number: ${{ github.event.issue.number }}
-          body: |
-            #### 🎉 Task executed successfully. Here is the artifact download URL:
-            [artifact-issue-${{ github.event.issue.number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.artifact-upload-step.outputs.artifact-id }})
-          reactions: '+1'
+      # - name: Post the artifact URL by comment if succeed
+      #   if: steps.artifact-upload-step.outcome == 'success'
+      #   uses: peter-evans/create-or-update-comment@v3
+      #   with:
+      #     issue-number: ${{ github.event.issue.number }}
+      #     body: |
+      #       #### 🎉 Task executed successfully. Here is the artifact download URL:
+      #       [artifact-issue-${{ github.event.discussion.number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.artifact-upload-step.outputs.artifact-id }})
+      #     reactions: '+1'
 
-      - name: Add sorry comment if failed
-        if: steps.artifact-upload-step.outcome != 'success'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh issue edit ${{ github.event.issue.number }} --remove-label "task pending"
-          gh issue edit ${{ github.event.issue.number }} --add-label "task failed"
-          gh issue comment ${{ github.event.issue.number }} --body "😢 Sorry for the failure"
+      # - name: Add sorry comment if failed
+      #   if: steps.artifact-upload-step.outcome != 'success'
+      #   env:
+      #     GH_TOKEN: ${{ github.token }}
+      #   run: |
+      #     gh issue edit ${{ github.event.discussion.number }} --remove-label "task pending"
+      #     gh issue edit ${{ github.event.discussion.number }} --add-label "task failed"
+      #     gh issue comment ${{ github.event.discussion.number }} --body "😢 Sorry for the failure"
           
       # - name: Close Issue
       #   env:
@@ -92,38 +93,38 @@ jobs:
       #     gh issue edit ${{ github.event.issue.number }} --add-label "task failed"
       #     gh issue close ${{ github.event.issue.number }} --comment "✔ Task completed, and close ticket." --reason "completed"
 
-      - name: Close Issue
-        uses: actions/github-script@v7.0.1
-        with:
-          script: |
-            const issueNumber = context.issue.number;
+      # - name: Close Issue
+      #   uses: actions/github-script@v7.0.1
+      #   with:
+      #     script: |
+      #       const issueNumber = context.issue.number;
             
-            await github.rest.issues.removeLabel({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: issueNumber,
-              name: 'task pending'
-            });
+      #       await github.rest.issues.removeLabel({
+      #         owner: context.repo.owner,
+      #         repo: context.repo.repo,
+      #         issue_number: issueNumber,
+      #         name: 'task pending'
+      #       });
             
-            await github.rest.issues.addLabels({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: issueNumber,
-              labels: ['task completed']
-            });
+      #       await github.rest.issues.addLabels({
+      #         owner: context.repo.owner,
+      #         repo: context.repo.repo,
+      #         issue_number: issueNumber,
+      #         labels: ['task completed']
+      #       });
 
-            const completedComment = `> ${ context.issue.body}\n\n✔ Task completed, and close ticket.`;
+      #       const completedComment = `> ${ context.issue.body}\n\n✔ Task completed, and close ticket.`;
             
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: issueNumber,
-              body: completedComment
-            });
+      #       await github.rest.issues.createComment({
+      #         owner: context.repo.owner,
+      #         repo: context.repo.repo,
+      #         issue_number: issueNumber,
+      #         body: completedComment
+      #       });
 
-            await github.rest.issues.update({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: issueNumber,
-              state: "closed"
-            });
+      #       await github.rest.issues.update({
+      #         owner: context.repo.owner,
+      #         repo: context.repo.repo,
+      #         issue_number: issueNumber,
+      #         state: "closed"
+      #       });
