@@ -67,7 +67,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - name: Post the artifact URL by comment if succeed
-        if: ${{ jobs.execute_job.result == 'success' }}
+        if: ${{ execute_job.result == 'success' }}
         uses: peter-evans/create-or-update-comment@v3
         with:
           issue-number: ${{ github.event.issue.number }}
@@ -77,7 +77,7 @@ jobs:
           reactions: '+1'
 
       - name: Add sorry comment if failed
-        if: ${{ jobs.execute_job.result == 'failure' }}
+        if: ${{ execute_job.result == 'failure' }}
         run:
           gh issue comment ${{ github.event.issue.number }} --body "😢Sorry for the failure"
           
