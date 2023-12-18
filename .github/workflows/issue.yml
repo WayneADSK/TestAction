@@ -39,8 +39,8 @@ jobs:
             });
 
             console.log("Issue Number: ", context.issue.number)
-            console.log("Issue Title: \n${{ context.issue.title }}")
-            console.log("Issue Description: \n${{ context.issue.body }}")
+            console.log(`Issue Title: \n${ context.issue.title }`)
+            console.log(`Issue Description: \n${ context.issue.body }`)
             
       # - name: Get issue info
       #   run: |
@@ -120,7 +120,7 @@ jobs:
               labels: ['task completed']
             });
 
-            const completedComment = "> ${{ context.issue.body}}\n\n✔ Task completed, and close ticket.";
+            const completedComment = `> ${ context.issue.body}\n\n✔ Task completed, and close ticket.`;
             
             await github.rest.issues.createComment({
               owner: context.repo.owner,
