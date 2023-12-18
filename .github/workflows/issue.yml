@@ -39,8 +39,8 @@ jobs:
             });
 
             console.log("Issue Number: ", context.issue.number)
-            console.log(`Issue Title: \n${ context.issue.title }`)
-            console.log(`Issue Description: \n${ context.issue.body }`)
+            console.log(`Issue Title: \n${ context.playload.issue.title }`)
+            console.log(`Issue Description: \n${ context.playload.issue.body }`)
             
       # - name: Get issue info
       #   run: |
