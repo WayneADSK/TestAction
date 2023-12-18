@@ -67,7 +67,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - name: Post the artifact URL by comment if succeed
-        if: ${{ execute_job.result == 'success' }}
+        if: ${{ jobs.execute_job.result }} == 'success'
         uses: peter-evans/create-or-update-comment@v3
         with:
           issue-number: ${{ github.event.issue.number }}
@@ -76,10 +76,10 @@ jobs:
             🎉 [artifact-issue-${{ github.event.issue.number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.artifact-upload-step.outputs.artifact-id }})
           reactions: '+1'
 
-      - name: Add sorry comment if failed
-        if: ${{ execute_job.result == 'failure' }}
-        run:
-          gh issue comment ${{ github.event.issue.number }} --body "😢Sorry for the failure"
+      # - name: Add sorry comment if failed
+      #   if: ${{ execute_job.result == 'failure' }}
+      #   run:
+      #     gh issue comment ${{ github.event.issue.number }} --body "😢Sorry for the failure"
           
       - name: Close Issue
         run: gh issue close ${{ github.event.issue.number }} --reason "Task completed, and close ticket." "${{ github.event.issue.number }}"
