@@ -1,14 +1,12 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: Hi, Translator
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  # Triggers the workflow
+  issues:
+    types: [opened, reopened]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -25,12 +23,45 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
-
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      # Get PR Title/Description
+      - name: Print PR Title/Description
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          echo "PR Title: ${{ github.event.pull_request.title }}"
+          echo "PR Description: ${{ github.event.pull_request.body }}"
+        
+      # Setup workspace
+      - name: Setup workspace
+        run: |
+          echo "The current workspace is under: "
+          pwd
+          mkdir tmp
+          pip install wget
+          pip install nltk
+
+      # Write issue body to file
+      - name: Download the file from issue request
+        run: |
+            cat << EOF > tmp/issue_body.txt
+            ${{ github.event.issue.body }}
+            EOF
+            cat tmp/issue_body.txt
+            
+      # Upload the issue body file
+      - uses: actions/upload-artifact@v4
+        id: artifact-upload-step
+        with:
+          name: artifact-issue-${{ github.event.issue.number }}
+          path: tmp/Translated -*.*
+
+      - name: Output artifact URL
+        run:  echo "Artifact URL is $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/artifacts/${{ steps.artifact-upload-step.outputs.artifact-id }}"
+
+      # Post translated artifact URL by comment
+      - name: Post translated artifact URL by comment
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            The translation results download URL:
+            [artifact-issue-${{ github.event.issue.number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.artifact-upload-step.outputs.artifact-id }})
+          reactions: '+1'
