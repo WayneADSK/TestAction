@@ -28,15 +28,11 @@ jobs:
         with:
           script: |
             console.log(context)
-          
-            const issueNumber = context.issue.number;
-            const labelToAdd = "task pending";
-            await github.rest.issues.addLabels({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: issueNumber,
-              labels: [labelToAdd]
-            });
+            const discussion = context.payload.discussion;
+            
+            console.log(`Discussion title: ${discussion.title}`);
+            console.log(`Discussion body: ${discussion.title}`);
+            console.log(`URL: ${discussion.url}`);
             
       - name: Get issue info
         run: |
